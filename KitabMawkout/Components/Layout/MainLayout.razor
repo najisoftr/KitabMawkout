@@ -1,0 +1,47 @@
+﻿@inherits LayoutComponentBase
+<RadzenComponents/>
+@* <div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div> *@
+
+<RadzenLayout dir="rtl">
+    <RadzenBody class="bg-dark bg-gradient">
+            @Body
+    </RadzenBody>
+
+    <RadzenFooter class="bg-dark bg-opacity-75">
+    <div class="row">
+        <div class="col-4">
+            <a href="/">
+                <button class="btn bg-dark w-100 h-100 border border-warning text-warning">الصفحة الرئيسية</button>
+            </a>
+        </div>
+
+        <div class="col-4">
+            <a href="/counter">
+                <button class="btn bg-dark w-100 h-100 border border-warning text-warning">كاونتر</button>
+            </a>
+        </div>
+
+        <div class="col-4">
+            <a href="/weather">
+                <button class="btn bg-dark w-100 h-100 border border-warning text-warning">أحوال الطقس</button>
+            </a>
+        </div>
+    </div>
+    </RadzenFooter>
+</RadzenLayout>
+
+
