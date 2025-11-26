@@ -1,5 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using KitabMawkout.Data.MyData;
+using KitabMawkout.Data.MyData.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Radzen;
+using System;
 
 namespace KitabMawkout;
 
@@ -23,7 +27,19 @@ public static class MauiProgram
 #endif
 
 		builder.Services.AddRadzenComponents();
+		builder.Services.AddDbContext<MyDbContext>();
+		builder.Services.AddSingleton<MySettingsRepo>();
 
-		return builder.Build();
-	}
+		var app= builder.Build();
+
+        // Apply migrations at startup
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+            db.Database.Migrate();
+        }
+
+        return app;
+
+    }
 }

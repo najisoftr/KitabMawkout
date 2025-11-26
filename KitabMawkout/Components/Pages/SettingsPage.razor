@@ -1,19 +1,26 @@
 ﻿@page "/settings"
+@inject MySettingsRepo MySettingsRepo
+@inject NotificationService NotificationService
+@inject NavigationManager Nav
 
 <h1 class="text-decoration-underline fw-bold text-light mb-3">صفحة الإعدادات</h1>
+<EditForm Model="settings" OnValidSubmit="SubmitFormAsync">
+    <DataAnnotationsValidator/>
 
     <div class="row mb-2">
         <div class="col-6">
             <div class="form-group">
-                <label style="color: lightgrey; font-size: 24px; margin-bottom:10px;">خط الطول رقم</label>
-                <input type="number" class="form-control bg-transparent text-light placeholder-glow fw-bold" style="font-size: 24px;" placeholder="خط الطول رقم"/>
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">خط الطول رقم</label>
+                <InputNumber @bind-Value="settings.Latitude" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 22px;" placeholder="خط الطول رقم"/>
+                <ValidationMessage For="()=>settings.Latitude"/>
             </div>
         </div>
 
         <div class="col-6">
             <div class="form-group">
-                <label style="color: lightgrey; font-size: 24px; margin-bottom:10px;">دائرة العرض رقم</label>
-                <input type="number" class="form-control bg-transparent text-light placeholder-glow fw-bold" style="font-size: 24px;" placeholder="دائرة العرض رقم" />
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">دائرة العرض رقم</label>
+                <InputNumber @bind-Value="settings.Longitude" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 22px;" placeholder="دائرة العرض رقم" />
+                <ValidationMessage For="() => settings.Longitude" />
             </div>
         </div>
     </div>
@@ -21,15 +28,27 @@
     <div class="row mb-2">
         <div class="col-6">
             <div class="form-group">
-                <label style="color: lightgrey; font-size: 24px; margin-bottom:10px;">طريقة الحساب</label>
-                <input type="number" class="form-control bg-transparent text-light placeholder-glow fw-bold" style="font-size: 24px;" placeholder="خط الطول رقم" />
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">طريقة الحساب</label>
+                <InputSelect TValue="CalculationMethod?" @bind-Value="settings.MyCalculationMethode" class="form-select bg-secondary bg-opacity-50 text-light fw-bold">
+                    @foreach(var meth in Enum.GetValues(typeof(CalculationMethod)))
+                    {
+                        <option value="@meth">@(meth.ToString())</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => settings.MyCalculationMethode" />
             </div>
         </div>
 
         <div class="col-6">
             <div class="form-group">
-                <label style="color: lightgrey; font-size: 24px; margin-bottom:10px;">المذهب</label>
-                <input type="number" class="form-control bg-transparent text-light placeholder-glow fw-bold" style="font-size: 24px;" placeholder="دائرة العرض رقم" />
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">المذهب</label>
+                <InputSelect TValue="Madhab?" @bind-Value="settings.MyMadhab" class="form-select bg-secondary bg-opacity-50 text-light fw-bold">
+                    @foreach (var madhab in Enum.GetValues(typeof(Madhab)))
+                    {
+                        <option value="@madhab">@(madhab.ToString())</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => settings.MyMadhab" />
             </div>
         </div>
     </div>
@@ -37,22 +56,47 @@
     <div class="row mb-3">
         <div class="col-12">
             <div class="form-group">
-                <label style="color: lightgrey; font-size: 24px; margin-bottom:10px;">إسم المسجد</label>
-                <input type="text" class="form-control bg-transparent text-light placeholder-glow fw-bold" style="font-size: 20px;" placeholder="إسم المسجد" />
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">إسم المسجد</label>
+                <InputText @bind-value="settings.DesMasjid" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 20px;" placeholder="إسم المسجد" />
+                <ValidationMessage For="() => settings.DesMasjid" />
             </div>
         </div>        
     </div>
 
     <div class="row">
         <div class="col-12">
-            <button class="btn btn-success w-100">
+            <button class="btn btn-success w-100" type="submit">
                 <img src="images/checkmark.png" style="width: 20px"/>
-                <span class="fw-bolder text-light" style="font-size: 24px;">حفظ الإعدادات</span>
+                <span class="fw-bolder text-light" style="font-size: 22px;">حفظ الإعدادات</span>
             </button>
         </div>
     </div>
+</EditForm>
 
 
 @code {
+    private SettingsVm settings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        settings = await MySettingsRepo.GetSettingAsync();
+    }
+
+    private async Task SubmitFormAsync()
+    {
+        try
+        {
+            await MySettingsRepo.SetSettingAsync(settings);
+        }
+        catch
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "حدث خطأ في حفظ المعلومات", "");
+            return;
+        }
+        NotificationService.Notify(NotificationSeverity.Success, "تم حفظ المعلومات بنجاح", "");
+        Nav.NavigateTo("/");
+
+    }
+
 
 }
