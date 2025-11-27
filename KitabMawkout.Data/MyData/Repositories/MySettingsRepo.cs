@@ -32,14 +32,16 @@ namespace KitabMawkout.Data.MyData.Repositories
         }
 
         //set settings
-        public async Task SetSettingAsync(SettingsVm seting)
+        public async Task SetSettingAsync(SettingsVm? seting)
         {
+            if (seting is null)
+                return;
             var setin =await db.MySettings.FirstOrDefaultAsync();
             if(setin is null)
             {
                 await db.MySettings.AddAsync(new MySetting
                 {
-                    DesMasjid = seting.DesMasjid,
+                    DesMasjid = seting!.DesMasjid,
                     Latitude = seting.Latitude,
                     Longitude = seting.Longitude,
                     MyCalculationMethode = seting.MyCalculationMethode,

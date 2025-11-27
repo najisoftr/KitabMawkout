@@ -1,3 +1,4 @@
+@inject MySettingsRepo MySettingsRepo
 <div class="card rounded-5">
     <div class="card-header">
             <h1 class="card-title text-warning fw-bolder text-center">
@@ -186,10 +187,20 @@
             </RadzenColumn>
         </RadzenRow>
     </div>
-
-
-
-
-
-
 </div>
+
+@code{
+    private PrayerTimes? prayersTimes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await MySettingsRepo.GetSettingAsync();
+        var coordinates = new Coordinates(settings!.Latitude??0.0, settings!.Longitude??0.0);
+        var madhab = settings.MyMadhab;
+        var calcMethod = settings.MyCalculationMethode;
+        CalculationMethodExtensions
+        
+        var myDate = new DateComponents(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+        prayersTimes = new PrayerTimes(coordinates, myDate, param);
+    }
+}
