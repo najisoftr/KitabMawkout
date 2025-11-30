@@ -26,7 +26,8 @@ namespace KitabMawkout.Data.MyData.Repositories
                     Latitude = seting.Latitude,
                     Longitude = seting.Longitude,
                     MyCalculationMethode = seting.MyCalculationMethode,
-                    MyMadhab = seting.MyMadhab
+                    MyMadhab = seting.MyMadhab,
+                    TimeZoneId = seting.TimeZoneId
                 };
             }
         }
@@ -46,6 +47,7 @@ namespace KitabMawkout.Data.MyData.Repositories
                     Longitude = seting.Longitude,
                     MyCalculationMethode = seting.MyCalculationMethode,
                     MyMadhab = seting.MyMadhab,
+                    TimeZoneId=seting.TimeZoneId,
                     MySettingsId = 1
                 });
             }
@@ -56,6 +58,7 @@ namespace KitabMawkout.Data.MyData.Repositories
                 setin.Longitude=seting.Longitude;
                 setin.Latitude=seting.Latitude;
                 setin.DesMasjid= seting.DesMasjid;
+                setin.TimeZoneId=seting.TimeZoneId;
             }
             await db.SaveChangesAsync();
         }

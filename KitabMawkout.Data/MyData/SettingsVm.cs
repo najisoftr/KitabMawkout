@@ -21,5 +21,8 @@ namespace KitabMawkout.Data.MyData
         [Required(ErrorMessage ="يرجى اختيار إسم المسجد")]
         [Length(5, 512, ErrorMessage ="إسم المسجد بين 5 و 512 حرفا")]
         public string? DesMasjid { get; set; } = string.Empty;
+
+        [Required(ErrorMessage ="يرجى اختيار المجال الزمني لمدينتك")]
+        public string? TimeZoneId { get; set; } = string.Empty;
     }
 }

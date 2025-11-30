@@ -1,3 +1,4 @@
+@using KitabMawkout.MyProcs
 @inject MySettingsRepo MySettingsRepo
 <div class="card rounded-5">
     <div class="card-header">
@@ -22,7 +23,7 @@
             </RadzenColumn>
 
             <RadzenColumn Size="3">
-                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">05:55</h2>
+                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">@fadjr</h2>
             </RadzenColumn>
 
             <RadzenColumn Size="3">
@@ -58,7 +59,7 @@
             </RadzenColumn>
 
             <RadzenColumn Size="3">
-                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">05:55</h2>
+                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">@dohr</h2>
             </RadzenColumn>
 
             <RadzenColumn Size="3">
@@ -95,7 +96,7 @@
             </RadzenColumn>
 
             <RadzenColumn Size="3">
-                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">05:55</h2>
+                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">@asr</h2>
             </RadzenColumn>
 
             <RadzenColumn Size="3">
@@ -131,7 +132,7 @@
             </RadzenColumn>
 
             <RadzenColumn Size="3">
-                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">05:55</h2>
+                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">@maghreb</h2>
             </RadzenColumn>
 
             <RadzenColumn Size="3">
@@ -167,7 +168,7 @@
             </RadzenColumn>
 
             <RadzenColumn Size="3">
-                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">05:55</h2>
+                <h2 class="bg-primary text-light rounded rounded-5 border border-3 fw-bolder p-1">@isha</h2>
             </RadzenColumn>
 
             <RadzenColumn Size="3">
@@ -191,16 +192,29 @@
 
 @code{
     private PrayerTimes? prayersTimes;
+    private string? fadjr = null;
+    private string? dohr = null;
+    private string? asr = null;
+    private string? maghreb = null;
+    private string? isha = null;
+    [Parameter]
+    public MySetting? settings{ get; set; } = new();
 
-    protected override async Task OnInitializedAsync()
+
+    protected override async Task OnParametersSetAsync()
     {
-        var settings = await MySettingsRepo.GetSettingAsync();
         var coordinates = new Coordinates(settings!.Latitude??0.0, settings!.Longitude??0.0);
-        var madhab = settings.MyMadhab;
-        var calcMethod = settings.MyCalculationMethode;
-        CalculationMethodExtensions
-        
+        Madhab madhab = settings.MyMadhab?? new();
+        CalculationMethod calcMethod = settings.MyCalculationMethode?? new();        
+        CalculationParameters parameters = CalculationMethodExtensions.GetParameters(calcMethod);
+        parameters.Madhab = madhab;
         var myDate = new DateComponents(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-        prayersTimes = new PrayerTimes(coordinates, myDate, param);
+        prayersTimes = new PrayerTimes(coordinates, myDate,parameters);
+        string timez = settings.TimeZoneId;
+        fadjr = TimeConvertToLocal.ConvertToLocal(prayersTimes.Fajr, timez).ToString("HH:mm");
+        dohr = TimeConvertToLocal.ConvertToLocal(prayersTimes.Dhuhr, timez).ToString("HH:mm");
+        asr = TimeConvertToLocal.ConvertToLocal(prayersTimes.Asr, timez).ToString("HH:mm");
+        maghreb = TimeConvertToLocal.ConvertToLocal(prayersTimes.Maghrib, timez).ToString("HH:mm");
+        isha = TimeConvertToLocal.ConvertToLocal(prayersTimes.Isha, timez).ToString("HH:mm"); 
     }
 }

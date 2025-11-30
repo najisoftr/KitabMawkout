@@ -1,4 +1,5 @@
 ﻿@page "/settings"
+@using System.Collections.ObjectModel
 @inject MySettingsRepo MySettingsRepo
 @inject NotificationService NotificationService
 @inject NavigationManager Nav
@@ -41,7 +42,7 @@
 
         <div class="col-6">
             <div class="form-group">
-                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">المذهب</label>
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">المذهب لحساب وقت العصر</label>
                 <InputSelect TValue="Madhab?" @bind-Value="settings.MyMadhab" class="form-select bg-secondary bg-opacity-50 text-light fw-bold">
                     @foreach (var madhab in Enum.GetValues(typeof(Madhab)))
                     {
@@ -54,14 +55,28 @@
     </div>
 
     <div class="row mb-3">
-        <div class="col-12">
+        <div class="col-6">
             <div class="form-group">
                 <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">إسم المسجد</label>
                 <InputText @bind-value="settings.DesMasjid" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 20px;" placeholder="إسم المسجد" />
                 <ValidationMessage For="() => settings.DesMasjid" />
             </div>
-        </div>        
+        </div>
+        
+        <div class="col-6">
+            <div class="form-group">
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">المجال الزمني لمدينتك</label>
+                <InputSelect TValue="string" @bind-Value="settings.TimeZoneId" class="form-select bg-secondary bg-opacity-50 text-light fw-bold">
+                    @foreach (var tz in timeZones)
+                    {
+                        <option value="@tz.Id">@(tz.DisplayName)</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => settings.TimeZoneId" />
+            </div>
+        </div>
     </div>
+
 
     <div class="row">
         <div class="col-12">
@@ -76,10 +91,12 @@
 
 @code {
     private SettingsVm? settings = new();
+    private ReadOnlyCollection<TimeZoneInfo>? timeZones;
 
     protected override async Task OnInitializedAsync()
     {
         settings = await MySettingsRepo.GetSettingAsync();
+        timeZones = TimeZoneInfo.GetSystemTimeZones();
     }
 
     private async Task SubmitFormAsync()

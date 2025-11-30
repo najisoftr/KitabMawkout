@@ -1,13 +1,41 @@
 ﻿@page "/"
+@inject NavigationManager Nav
+@inject MySettingsRepo MySettingsRepo
 
-
+@if(settings is not null)
+{
     <div class="row">
         <div class="col-6">
-            <PrayersTimeComp />
+            <PrayersTimeComp settings="settings" />
         </div>
 
         <div class="col-6">
-            <PrayInfoComp/>
+            <PrayInfoComp mySetting="settings" Chourouk="15:55"/>
         </div>
     </div>
+}
+
+
+@code{
+    private MySetting? settings =null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settingVm = await MySettingsRepo.GetSettingAsync();
+        if(settingVm is null)
+            Nav.NavigateTo("/settings");
+
+        settings = new MySetting
+            {
+                DesMasjid = settingVm!.DesMasjid,
+                Latitude = settingVm.Latitude,
+                Longitude = settingVm.Longitude,
+                MyCalculationMethode = settingVm.MyCalculationMethode,
+                MyMadhab = settingVm.MyMadhab,
+                MySettingsId = 1,
+                TimeZoneId = settingVm.TimeZoneId
+            };
+    }
+    
+}
 

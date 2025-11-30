@@ -2,13 +2,18 @@
     <h1 style="font-size:4em; color:white;">آذان الظهر بعد</h1>
     <h1 style="font-size: 4em; color:white;">02 سا 55 د و 25 ثا</h1>
     <h3 style="color: white;">
-        <img src="images/mosquegps128.png" style="width:48px;"/>
-        مسجد سعد ابن أبي وقاس، وادي الزناتي
+        <img src="images/mosquegps128.png" style="width:42px;"/>
+        @mySetting.DesMasjid
+    </h3>
+
+    <h3 style="color: white;">
+        <img src="images/calendar128.png" style="width:42px;"/>
+        @DateTime.Now.ToLongDateString()
     </h3>
 
     <div class="row">
         <div class="col-6">
-            <h2 style="color: white;">الشروق على 06:36</h2>
+            <h2 style="color: white;">الشروق على @Chourouk</h2>
             
         </div>
 
@@ -18,3 +23,12 @@
         </div>
     </div>
 </div>
+
+@code{
+    [Parameter]
+    public MySetting? mySetting { get; set; } = new();
+
+    [Parameter]
+    public string? Chourouk { get; set; } = "10:55";
+
+}
