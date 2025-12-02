@@ -5,19 +5,32 @@
 @if(settings is not null)
 {
     <div class="row">
-        <div class="col-6">
-            <PrayersTimeComp settings="settings" />
-        </div>
+        @if(settings is not null && prayersTimes is not null)
+        {
+            <div class="col-6">
+                <PrayersTimeComp settings="settings" prayersTimes="prayersTimes"/>    
+            </div>
 
-        <div class="col-6">
-            <PrayInfoComp mySetting="settings" Chourouk="15:55"/>
-        </div>
+            <div class="col-6">
+                <PrayInfoComp nowToday="nowToday" mySetting="settings" Chourouk="@chourouk.ToString("HH:mm")" prayersTimes="prayersTimes"/>
+            </div>    
+        }
+        else
+        {
+            <div class="rz-m-12">
+                <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" AriaLabel="Loading progress" />
+            </div>
+        }
+
     </div>
 }
 
 
 @code{
     private MySetting? settings =null;
+    private PrayerTimes? prayersTimes;
+    private DateTime chourouk;
+    private DateTime nowToday;
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,6 +48,16 @@
                 MySettingsId = 1,
                 TimeZoneId = settingVm.TimeZoneId
             };
+
+        var coordinates = new Coordinates(settings!.Latitude??0.0, settings!.Longitude??0.0);
+        Madhab madhab = settings.MyMadhab?? new();
+        CalculationMethod calcMethod = settings.MyCalculationMethode?? new();        
+        CalculationParameters parameters = CalculationMethodExtensions.GetParameters(calcMethod);
+        parameters.Madhab = madhab;
+        var myDate = new DateComponents(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+        prayersTimes = new PrayerTimes(coordinates, myDate,parameters);
+        string timez = settings.TimeZoneId;
+        chourouk=TimeConvertToLocal.ConvertToLocal(prayersTimes.Sunrise, timez);
     }
     
 }

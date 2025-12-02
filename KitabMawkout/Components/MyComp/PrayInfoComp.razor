@@ -8,7 +8,7 @@
 
     <h3 style="color: white;">
         <img src="images/calendar128.png" style="width:42px;"/>
-        @DateTime.Now.ToLongDateString()
+        @nowToday.ToString("dd-MM-yyyy HH:mm:ss")
     </h3>
 
     <div class="row">
@@ -22,6 +22,7 @@
             
         </div>
     </div>
+
 </div>
 
 @code{
@@ -30,5 +31,22 @@
 
     [Parameter]
     public string? Chourouk { get; set; } = "10:55";
+
+    [Parameter]
+    public PrayerTimes? prayersTimes { get; set; }
+
+    [Parameter]
+    public DateTime nowToday { get; set; }
+
+
+    protected override void OnParametersSet()
+    {
+        if(mySetting is not null && prayersTimes is not null)
+        {
+            currentPrayer = prayersTimes.CurrentPrayer(DateTime.Now).ToString();
+            nextPrayer = prayersTimes.NextPrayer(DateTime.Now).ToString();
+            timeToNextPrayer = prayersTimes.NextPrayer(DateTime.Now).ToString();
+        }
+    }
 
 }

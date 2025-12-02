@@ -24,5 +24,26 @@ namespace KitabMawkout.Data.MyData
 
         [Required(ErrorMessage ="يرجى اختيار المجال الزمني لمدينتك")]
         public string? TimeZoneId { get; set; } = string.Empty;
+
+        [Required(ErrorMessage ="وقت الإنتظار إجباري")]
+        [Range(0,30,ErrorMessage ="وقت الإنتظار ما بين 0 و 30 دقيقة")]
+        public int FadjWait { get; set; } = 20;
+
+        [Required(ErrorMessage = "وقت الإنتظار إجباري")]
+        [Range(0, 30, ErrorMessage = "وقت الإنتظار ما بين 0 و 30 دقيقة")]
+        public int DohrWait { get; set; } = 10;
+
+        [Required(ErrorMessage = "وقت الإنتظار إجباري")]
+        [Range(0, 30, ErrorMessage = "وقت الإنتظار ما بين 0 و 30 دقيقة")]
+        public int AsrWait { get; set; } = 12;
+
+        [Required(ErrorMessage = "وقت الإنتظار إجباري")]
+        [Range(0, 30, ErrorMessage = "وقت الإنتظار ما بين 0 و 30 دقيقة")]
+        public int MoghrebWait { get; set; } = 2;
+
+        [Required(ErrorMessage = "وقت الإنتظار إجباري")]
+        [Range(0, 30, ErrorMessage = "وقت الإنتظار ما بين 0 و 30 دقيقة")]
+        public int IshabWait { get; set; } = 10;
+
     }
 }

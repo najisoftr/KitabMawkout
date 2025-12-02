@@ -78,6 +78,49 @@
     </div>
 
 
+    <div class="row mb-3">
+        <div class="col">
+            <div class="form-group">
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">وقت انتظار الصبح(دقيقة)ـ</label>
+                <InputNumber @bind-value="settings.FadjWait" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 20px;" placeholder="انتظار الصبح" />
+                <ValidationMessage For="() => settings.FadjWait" />
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="form-group">
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">وقت انتظار الظهر(دقيقة)ـ</label>
+                <InputNumber @bind-value="settings.DohrWait" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 20px;" placeholder="انتظار الظهر" />
+                <ValidationMessage For="() => settings.DohrWait" />
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="form-group">
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">وقت انتظار العصر(دقيقة)ـ</label>
+                <InputNumber @bind-value="settings.AsrWait" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 20px;" placeholder="انتظار العصر" />
+                <ValidationMessage For="() => settings.AsrWait" />
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="form-group">
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">وقت انتظار المغرب(دقيقة)ـ</label>
+                <InputNumber @bind-value="settings.MoghrebWait" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 20px;" placeholder="انتظار المغرب" />
+                <ValidationMessage For="() => settings.MoghrebWait" />
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="form-group">
+                <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">وقت انتظار العشاء(دقيقة)ـ</label>
+                <InputNumber @bind-value="settings.IshabWait" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 20px;" placeholder="انتظار العشاء" />
+                <ValidationMessage For="() => settings.IshabWait" />
+            </div>
+        </div>
+    </div>
+
+
     <div class="row">
         <div class="col-12">
             <button class="btn btn-success w-100" type="submit">
