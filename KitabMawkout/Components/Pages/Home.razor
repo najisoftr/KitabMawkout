@@ -55,10 +55,10 @@
         CalculationParameters parameters = CalculationMethodExtensions.GetParameters(calcMethod);
         parameters.Madhab = madhab;
         var myDate = new DateComponents(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-        prayersTimes = new PrayerTimes(coordinates, myDate,parameters);
         string timez = settings.TimeZoneId;
+        prayersTimes = new PrayerTimes(coordinates, myDate,parameters);        
         chourouk=TimeConvertToLocal.ConvertToLocal(prayersTimes.Sunrise, timez);
-    }
-    
+        nowToday = DateTime.Now;
+    }    
 }
 

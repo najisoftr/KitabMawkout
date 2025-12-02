@@ -37,16 +37,4 @@
 
     [Parameter]
     public DateTime nowToday { get; set; }
-
-
-    protected override void OnParametersSet()
-    {
-        if(mySetting is not null && prayersTimes is not null)
-        {
-            currentPrayer = prayersTimes.CurrentPrayer(DateTime.Now).ToString();
-            nextPrayer = prayersTimes.NextPrayer(DateTime.Now).ToString();
-            timeToNextPrayer = prayersTimes.NextPrayer(DateTime.Now).ToString();
-        }
-    }
-
 }
