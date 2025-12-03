@@ -1,6 +1,13 @@
 ﻿<div class="card bg-warning bg-opacity-25 h-100 border border-3 border-warning rounded-5 p-2 text-center">
-    <h1 style="font-size:4em; color:white;">آذان الظهر بعد</h1>
-    <h1 style="font-size: 4em; color:white;">02 سا 55 د و 25 ثا</h1>
+    <h1 style="font-size:4em; color:white;" class="text-center">
+        آذان @nextPrayerNameArab بعد        
+    </h1>
+    <h1 style="font-size:4em; color:white;" class="text-center">
+        @countDownToNextPrayerArab
+    </h1>
+
+    
+    
     <h3 style="color: white;">
         <img src="images/mosquegps128.png" style="width:42px;"/>
         @mySetting.DesMasjid
@@ -37,4 +44,46 @@
 
     [Parameter]
     public DateTime nowToday { get; set; }
+
+    [Parameter]
+    public string nextPrayerName { get; set; } = "";
+
+    [Parameter]
+    public TimeSpan countDownToNextPrayer { get; set; }
+    private string nextPrayerNameArab = "";
+    private string countDownToNextPrayerArab = "";
+
+    protected override void OnParametersSet()
+    {
+        switch(nextPrayerName)
+        {
+            case "NONE":
+                nextPrayerNameArab = "";
+                break;
+            case "FAJR":
+                nextPrayerNameArab = "الفجر";
+                break;
+            case "SUNRISE":
+                nextPrayerNameArab = "الشروق";
+                break;
+            case "DHUHR":
+                nextPrayerNameArab = "الظهر";
+                break;
+            case "ASR":
+                nextPrayerNameArab = "العصر";
+                break;
+            case "MAGHRIB":
+                nextPrayerNameArab = "المغرب";
+                break;
+            case "ISHA":
+                nextPrayerNameArab = "العشاء";
+                break;
+            default:
+                nextPrayerNameArab = "";
+                break;
+        }
+
+        countDownToNextPrayerArab = $"{countDownToNextPrayer.Hours.ToString()} سا , {countDownToNextPrayer.Minutes.ToString()} د , {countDownToNextPrayer.Seconds.ToString()} ثا";
+    }
+
 }
