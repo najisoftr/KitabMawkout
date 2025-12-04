@@ -3,24 +3,23 @@
 @inject NavigationManager Nav
 @inject MySettingsRepo MySettingsRepo
 
-@if(settings is not null)
+@if (settings is not null)
 {
     <div class="row">
-        @if(settings is not null && prayersTimes is not null)
+        @if (settings is not null && prayersTimes is not null)
         {
             <div class="col-6">
-                <PrayersTimeComp settings="settings" prayersTimes="prayersTimes"/>    
+                <PrayersTimeComp settings="settings" prayersTimes="prayersTimes" />
             </div>
 
             <div class="col-6">
-                <PrayInfoComp
-                    nextPrayerName="@nextPrayerName"
-                    countDownToNextPrayer="@countDownToNextPrayer" 
-                    nowToday="nowToday" 
-                    mySetting="settings" 
-                    Chourouk="@chourouk.ToString("HH:mm")" 
-                    prayersTimes="prayersTimes"/>
-            </div>    
+                <PrayInfoComp nextPrayerName="@nextPrayerName"
+                              countDownToNextPrayer="@countDownToNextPrayer"
+                              nowToday="nowToday"
+                              mySetting="settings"
+                              Chourouk="@chourouk.ToString("HH:mm")"
+                              prayersTimes="prayersTimes" />
+            </div>
         }
         else
         {
@@ -33,8 +32,11 @@
 }
 
 
-@code{
-    private MySetting? settings =null;
+@code {
+    // Ensure you replace these with your actual model classes and repository/utility classes
+    // e.g., MySetting, PrayerTimes, Coordinates, Madhab, CalculationMethod, TimeConvertToLocal, Prayer
+
+    private MySetting? settings = null;
     private PrayerTimes? prayersTimes;
     private DateTime chourouk;
     private DateTime nowToday;
@@ -43,99 +45,186 @@
 
     private PeriodicTimer? timer;
     private bool running = true;
-    private double progressValue;
+
+    // --- Lifecycle Methods ---
 
     protected override async Task OnInitializedAsync()
     {
         var settingVm = await MySettingsRepo.GetSettingAsync();
-        if(settingVm is null)
+        if (settingVm is null)
             Nav.NavigateTo("/settings");
 
         settings = new MySetting
-            {
-                DesMasjid = settingVm!.DesMasjid,
-                Latitude = settingVm.Latitude,
-                Longitude = settingVm.Longitude,
-                MyCalculationMethode = settingVm.MyCalculationMethode,
-                MyMadhab = settingVm.MyMadhab,
-                MySettingsId = 1,
-                TimeZoneId = settingVm.TimeZoneId
-            };
+        {
+            DesMasjid = settingVm!.DesMasjid,
+            Latitude = settingVm.Latitude,
+            Longitude = settingVm.Longitude,
+            MyCalculationMethode = settingVm.MyCalculationMethode,
+            MyMadhab = settingVm.MyMadhab,
+            MySettingsId = 1,
+            TimeZoneId = settingVm.TimeZoneId
+        };
 
-        //first load
-        await LoadPrayersTimes();
-        //now start the timer
+        // First load of today's prayer times
+        await LoadPrayersTimes(DateTime.Now);
+
+        // Now start the timer
         timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
         _ = RunTimerLoop();
     }
 
+    public void Dispose()
+    {
+        running = false;
+        timer?.Dispose();
+    }
+
+    // --- Timer Loop and Data Loading ---
+
     private async Task RunTimerLoop()
     {
-        while(running && timer is not null && await timer.WaitForNextTickAsync())
+        while (running && timer is not null && await timer.WaitForNextTickAsync())
         {
             nowToday = DateTime.Now;
             UpdateNextPrayerInfo();
+
+            // Check for midnight to load the next day's times
             if (nowToday.Hour == 0 && nowToday.Minute == 0 && nowToday.Second == 0)
-                await LoadPrayersTimes();
-                await InvokeAsync(StateHasChanged);
+            {
+                await LoadPrayersTimes(nowToday);
+            }
+
+            await InvokeAsync(StateHasChanged);
         }
     }
 
 
-    //calculat prayers times
-    private Task LoadPrayersTimes()
+    /// <summary>
+    /// Calculates prayer times for a specific date.
+    /// </summary>
+    private Task LoadPrayersTimes(DateTime date)
     {
-        var coordinates = new Coordinates(settings!.Latitude??0.0, settings!.Longitude??0.0);
-        Madhab madhab = settings.MyMadhab?? new();
-        CalculationMethod calcMethod = settings.MyCalculationMethode?? new();        
+        var coordinates = new Coordinates(settings!.Latitude ?? 0.0, settings!.Longitude ?? 0.0);
+        Madhab madhab = settings.MyMadhab ?? new();
+        CalculationMethod calcMethod = settings.MyCalculationMethode ?? new();
         CalculationParameters parameters = CalculationMethodExtensions.GetParameters(calcMethod);
         parameters.Madhab = madhab;
-        var myDate = new DateComponents(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-        string timez = settings.TimeZoneId;
-        prayersTimes = new PrayerTimes(coordinates, myDate,parameters);        
-        chourouk=TimeConvertToLocal.ConvertToLocal(prayersTimes.Sunrise, timez);
+
+        // Ensure the DateComponents is built from the specific date parameter
+        var myDate = new DateComponents(date.Year, date.Month, date.Day);
+
+        string timez = settings.TimeZoneId!;
+        prayersTimes = new PrayerTimes(coordinates, myDate, parameters);
+
+        // Sunrise (Chourouk) for today
+        DateTime? sunriseUtc = prayersTimes.TimeForPrayer(Prayer.SUNRISE);
+        if (sunriseUtc.HasValue)
+        {
+            chourouk = TimeConvertToLocal.ConvertToLocal(sunriseUtc.Value, timez);
+        }
+
         nowToday = DateTime.Now;
         return Task.CompletedTask;
     }
+
+   
 
     private void UpdateNextPrayerInfo()
     {
         if (prayersTimes == null || settings == null)
             return;
 
-        // 1. Get next prayer enum
-        Prayer next = prayersTimes.NextPrayer(nowToday);
-        //Prayer next = prayersTimes.CurrentPrayer(nowToday);
+        // We will use this loop to force the transition to the *next* prayer
+        // if the time of the currently found prayer has passed.
+        bool transitionNeeded = true;
 
-        // If done for today
-        if (next == Prayer.NONE)
+        while (transitionNeeded)
         {
-            nextPrayerName = "";
-            countDownToNextPrayer = TimeSpan.Zero;
-            return;
+            transitionNeeded = false; // Assume we find the correct prayer on this run
+
+            // 1. Get current time in UTC for comparison with the library's times
+            DateTime nowUtc = DateTime.UtcNow;
+            Prayer next = prayersTimes.NextPrayer(nowUtc);
+
+            DateTime nextLocal;
+            DateTime? nextTimeUtc;
+
+            // 2. Check for Rollover (Past Isha)
+            if (next == Prayer.NONE)
+            {
+                // --- Rollover Logic: Next Prayer is Tomorrow's Fajr ---
+                // (Same code as before for calculating tomorrow's Fajr)
+                DateTime tomorrow = DateTime.Now.AddDays(1);
+                var coordinates = new Coordinates(settings.Latitude ?? 0.0, settings.Longitude ?? 0.0);
+                Madhab madhab = settings.MyMadhab ?? new();
+                CalculationMethod calcMethod = settings.MyCalculationMethode ?? new();
+                CalculationParameters parameters = CalculationMethodExtensions.GetParameters(calcMethod);
+                parameters.Madhab = madhab;
+                var tomorrowDate = new DateComponents(tomorrow.Year, tomorrow.Month, tomorrow.Day);
+
+                PrayerTimes tomorrowPrayers = new PrayerTimes(coordinates, tomorrowDate, parameters);
+                nextTimeUtc = tomorrowPrayers.TimeForPrayer(Prayer.FAJR);
+
+                if (nextTimeUtc.HasValue)
+                {
+                    nextPrayerName = "FAJR";
+                    nextLocal = TimeConvertToLocal.ConvertToLocal(nextTimeUtc.Value, settings.TimeZoneId);
+                }
+                else
+                {
+                    nextPrayerName = "FAJR2";
+                    countDownToNextPrayer = TimeSpan.Zero;
+                    return;
+                }
+            }
+            else
+            {
+                // --- Normal Logic: Prayer is Today ---
+
+                nextPrayerName = next.ToString();
+                nextTimeUtc = prayersTimes.TimeForPrayer(next);
+
+                if (!nextTimeUtc.HasValue)
+                {
+                    nextPrayerName = "";
+                    countDownToNextPrayer = TimeSpan.Zero;
+                    return;
+                }
+
+                nextLocal = TimeConvertToLocal.ConvertToLocal(nextTimeUtc.Value, settings.TimeZoneId);
+            }
+
+            // 3. Countdown calculation
+            countDownToNextPrayer = nextLocal - nowToday;
+
+            // 4. CHECK FOR TRANSITION: If the countdown is negative or zero,
+            //    the prayer has just passed or is current, and we must find the next one.
+            // We use a small buffer (e.g., 1 second) to ensure we move past the boundary.
+            if (countDownToNextPrayer.TotalSeconds <= 0)
+            {
+                // Check if the current prayer time has actually passed.
+                // Compare the Local Prayer Time with the Current Local Time.
+                if (nextLocal <= nowToday)
+                {
+                    // This means the prayer identified by 'next' is now in the past.
+                    // We need to re-run the logic immediately to find the next one.
+                    transitionNeeded = true;
+
+                    // IMPORTANT: If we are past Isha (Prayer.NONE), we don't need to re-run,
+                    // as the rollover logic already set it to tomorrow's Fajr.
+                    if (next == Prayer.NONE)
+                    {
+                        transitionNeeded = false;
+                    }
+
+                    // If a transition is needed, we set countdown to zero for one tick
+                    // and break out to allow the while loop to re-run the calculation.
+                    countDownToNextPrayer = TimeSpan.Zero;
+                }
+            }
+
+            // If transitionNeeded is true, the loop runs again immediately with a slightly
+            // advanced 'nowUtc', which forces the library to return the subsequent prayer.
         }
-
-        nextPrayerName = next.ToString();
-
-        // 2. Get the next prayer time
-        DateTime? nextTime = prayersTimes.TimeForPrayer(next);
-
-        // 3. Convert to local time
-        DateTime nextLocal = TimeConvertToLocal.ConvertToLocal(nextTime ?? DateTime.Now, settings.TimeZoneId);
-
-        // 4. Countdown
-        countDownToNextPrayer = nextLocal - nowToday;
-
-        if (countDownToNextPrayer.TotalSeconds < 0)
-            countDownToNextPrayer = TimeSpan.Zero;
-    }
-
-
-    //dispose the timer
-    public void Dispose()
-    {
-        running = false;
-        timer?.Dispose();
     }
 }
-
