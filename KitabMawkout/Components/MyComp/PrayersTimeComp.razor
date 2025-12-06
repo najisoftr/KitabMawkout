@@ -8,7 +8,7 @@
     </div>
 
     <div class="card-body">
-        <RadzenRow Style="margin-bottom: -24px;">
+        <RadzenRow Style="margin-bottom: -24px;" class="@(nextPrayerName == "FAJR" ? "bg-success-subtle border-danger border border-3 rounded rounded-4" : "")">
             <RadzenColumn Size="3">
                 <div class="row">
                     <div class="col-4">
@@ -44,7 +44,7 @@
 
         <hr style="color: slateblue;" />
 
-        <RadzenRow Style="margin-bottom: -24px;">
+        <RadzenRow Style="margin-bottom: -24px;" class="@(nextPrayerName == "DHUHR" ? "bg-success-subtle border-danger border border-3 rounded rounded-4" : "")">
             <RadzenColumn Size="3">
                 <div class="row">
                     <div class="col-4">
@@ -81,7 +81,7 @@
         <hr style="color: slateblue;" />
 
 
-        <RadzenRow Style="margin-bottom: -24px;">
+        <RadzenRow Style="margin-bottom: -24px;" class="@(nextPrayerName == "ASR" ? "bg-success-subtle border-danger border border-3 rounded rounded-4" : "")">
             <RadzenColumn Size="3">
                 <div class="row">
                     <div class="col-4">
@@ -117,7 +117,7 @@
 
         <hr style="color: slateblue;" />
 
-        <RadzenRow Style="margin-bottom: -24px;" class="bg-success-subtle border-danger border rounded rounded-4">
+        <RadzenRow Style="margin-bottom: -24px;" class="@(nextPrayerName == "MAGHRIB" ? "bg-success-subtle border-danger border border-3 rounded rounded-4" : "")">
             <RadzenColumn Size="3">
                 <div class="row">
                     <div class="col-4">
@@ -153,7 +153,7 @@
 
         <hr style="color: slateblue;" />
 
-        <RadzenRow Style="margin-bottom: -24px;">
+        <RadzenRow Style="margin-bottom: -24px;" class="@(nextPrayerName == "ISHA" ? "bg-success-subtle border-danger border border-3 rounded rounded-4" : "")">
             <RadzenColumn Size="3">
                 <div class="row">
                     <div class="col-4">
@@ -192,6 +192,10 @@
 @code{
     [Parameter]
     public PrayerTimes? prayersTimes { get; set; }
+
+    [Parameter]
+    public string? nextPrayerName { get; set; }
+
     private DateTime fadjr ;
     private DateTime dohr ;
     private DateTime asr ;

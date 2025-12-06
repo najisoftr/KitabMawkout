@@ -12,7 +12,7 @@
         <div class="col-6">
             <div class="form-group">
                 <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">خط الطول رقم</label>
-                <InputNumber @bind-Value="settings.Latitude" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 22px;" placeholder="خط الطول رقم"/>
+                <InputNumber @bind-Value="settings!.Latitude" class="form-control bg-secondary bg-opacity-50 text-light fw-bold" style="font-size: 22px;" placeholder="خط الطول رقم"/>
                 <ValidationMessage For="()=>settings.Latitude"/>
             </div>
         </div>
@@ -67,7 +67,7 @@
             <div class="form-group">
                 <label style="color: lightgrey; font-size: 22px; margin-bottom:10px;">المجال الزمني لمدينتك</label>
                 <InputSelect TValue="string" @bind-Value="settings.TimeZoneId" class="form-select bg-secondary bg-opacity-50 text-light fw-bold">
-                    @foreach (var tz in timeZones)
+                    @foreach (var tz in timeZones!)
                     {
                         <option value="@tz.Id">@(tz.DisplayName)</option>
                     }
